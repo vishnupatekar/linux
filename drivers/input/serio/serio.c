@@ -165,6 +165,49 @@ struct serio_event {
 static DEFINE_SPINLOCK(serio_event_lock);	/* protects serio_event_list */
 static LIST_HEAD(serio_event_list);
 
+struct serio_devres {
+	struct serio *serio;
+};
+
+static int devm_serio_device_match(struct device *dev, void *res, void *data)
+{
+	struct serio_devres *devres = res;
+
+	return devres->serio == data;
+}
+
+static void devm_serio_device_release(struct device *dev, void *res)
+{
+	struct serio_devres *devres = res;
+	struct serio *serio = devres->serio;
+
+	dev_dbg(dev, "%s: dropping reference to %s\n",
+		__func__, dev_name(&serio->dev));
+	serio_unregister_port(serio);
+}
+
+struct serio *devm_serio_allocate_device(struct device *dev)
+{
+	struct	serio *serio;
+	struct	serio_devres *devres;
+
+	devres = devres_alloc(devm_serio_device_release,
+			      sizeof(struct serio_devres), GFP_KERNEL);
+	if (!devres)
+		return NULL;
+
+	__serio_register_port(serio, THIS_MODULE);
+
+	serio->dev.parent = dev;
+	serio->devres_managed = true;
+
+	devres->serio = serio;
+	devres_add(dev, devres);
+
+	return serio;
+}
+EXPORT_SYMBOL(devm_serio_allocate_device);
+
 static struct serio_event *serio_get_event(void)
 {
 	struct serio_event *event = NULL;
@@ -706,14 +749,41 @@ void serio_reconnect(struct serio *serio)
 }
 EXPORT_SYMBOL(serio_reconnect);
 
+static void devm_serio_device_unregister(struct device *dev, void *res)
+{
+	struct serio_devres *devres = res;
+	struct serio *serio = devres->serio;
+
+	dev_dbg(dev, "%s: unregistering device %s\n",
+		__func__, dev_name(&serio->dev));
+	serio_unregister_port(serio);
+}
+
 /*
  * Submits register request to kseriod for subsequent execution.
  * Note that port registration is always asynchronous.
  */
 void __serio_register_port(struct serio *serio, struct module *owner)
 {
+	struct serio_devres *devres = NULL;
+
+	if (serio->devres_managed) {
+		devres = devres_alloc(devm_serio_device_unregister,
+				      sizeof(struct serio_devres), GFP_KERNEL);
+		if (!devres)
+			return -ENOMEM;
+
+		devres->serio = serio;
+	}
+
 	serio_init_port(serio);
 	serio_queue_event(serio, owner, SERIO_REGISTER_PORT);
+
+	if (serio->devres_managed) {
+		dev_dbg(serio->dev.parent, "%s: registering %s with devres.\n",
+			__func__, dev_name(&serio->dev));
+		devres_add(serio->dev.parent, devres);
+	}
 }
 EXPORT_SYMBOL(__serio_register_port);
 
@@ -722,10 +792,18 @@ EXPORT_SYMBOL(__serio_register_port);
  */
 void serio_unregister_port(struct serio *serio)
 {
+	if (serio->devres_managed) {
+		WARN_ON(devres_destroy(serio->dev.parent,
+					devm_serio_device_unregister,
+					devm_serio_device_match,
+					serio));
+	}
+
 	mutex_lock(&serio_mutex);
 	serio_disconnect_port(serio);
 	serio_destroy_port(serio);
 	mutex_unlock(&serio_mutex);
+
 }
 EXPORT_SYMBOL(serio_unregister_port);
 

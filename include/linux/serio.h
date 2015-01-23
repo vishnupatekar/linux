@@ -48,6 +48,7 @@ struct serio {
 	struct device dev;
 
 	struct list_head node;
+	bool devres_managed;
 };
 #define to_serio_port(d)	container_of(d, struct serio, dev)
 
@@ -75,6 +76,7 @@ void serio_reconnect(struct serio *serio);
 irqreturn_t serio_interrupt(struct serio *serio, unsigned char data, unsigned int flags);
 
 void __serio_register_port(struct serio *serio, struct module *owner);
+struct serio __must_check *devm_serio_allocate_device(struct device *);
 
 /* use a define to avoid include chaining to get THIS_MODULE */
 #define serio_register_port(serio) \
