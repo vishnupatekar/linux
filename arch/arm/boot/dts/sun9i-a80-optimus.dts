@@ -204,9 +204,17 @@
 		interrupt-parent = <&nmi_intc>;
 		interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
 	};
+
+	axp806: pmic@745 {
+		reg = <0x745>;
+		interrupt-parent = <&nmi_intc>;
+		interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
+		bldoin-supply = <&reg_dcdce>;
+	};
 };
 
 #include "axp809.dtsi"
+#include "axp806.dtsi"
 
 &reg_aldo1 {
 	regulator-always-on;
@@ -219,6 +227,48 @@
 	regulator-min-microvolt = <1800000>;
 	regulator-max-microvolt = <1800000>;
 	regulator-name = "vcc-pb-io-cam";
+};
+
+&reg_bldo1 {
+	regulator-always-on;
+	regulator-min-microvolt = <1620000>;
+	regulator-max-microvolt = <1980000>;
+	regulator-name = "vcc18-efuse-adc-display-csi";
+};
+
+&reg_bldo2 {
+	regulator-always-on;
+	regulator-min-microvolt = <1620000>;
+	regulator-max-microvolt = <1980000>;
+	regulator-name = "vdd18-drampll-vcc18-pll-cpvdd";
+};
+
+&reg_bldo4 {
+	regulator-min-microvolt = <1080000>;
+	regulator-max-microvolt = <1320000>;
+	regulator-name = "vcc12-hsic";
+};
+
+&reg_cldo1 {
+	/*
+	 * This was 3V in the original design, but 3.3V is the
+	 * recommended supply voltage for the Ethernet PHY.
+	 */
+	regulator-min-microvolt = <3300000>;
+	regulator-max-microvolt = <3300000>;
+	regulator-name = "vcc-gmac-phy";
+};
+
+&reg_cldo2 {
+	regulator-min-microvolt = <2800000>;
+	regulator-max-microvolt = <2800000>;
+	regulator-name = "afvcc-cam";
+};
+
+&reg_cldo3 {
+	regulator-min-microvolt = <3000000>;
+	regulator-max-microvolt = <3000000>;
+	regulator-name = "vcc-io-wifi-codec-io2";
 };
 
 &reg_dc5ldo {
@@ -262,6 +312,27 @@
 	regulator-name = "vcc-dram";
 };
 
+&reg_dcdca {
+	regulator-always-on;
+	regulator-min-microvolt = <800000>;
+	regulator-max-microvolt = <1100000>;
+	regulator-name = "vdd-cpub";
+};
+
+&reg_dcdcd {
+	regulator-always-on;
+	regulator-min-microvolt = <800000>;
+	regulator-max-microvolt = <1100000>;
+	regulator-name = "vdd-vpu";
+};
+
+&reg_dcdce {
+	regulator-always-on;
+	regulator-min-microvolt = <2100000>;
+	regulator-max-microvolt = <2100000>;
+	regulator-name = "vcc-bldo-codec-ldoin";
+};
+
 &reg_dldo1 {
 	/*
 	 * The WiFi chip supports a wide range (3.0 ~ 4.8V) of voltages,
@@ -297,6 +368,13 @@
 	regulator-min-microvolt = <3000000>;
 	regulator-max-microvolt = <3000000>;
 	regulator-name = "vcc-pm-codec-io1";
+};
+
+&reg_s_aldo1 {
+	regulator-always-on;
+	regulator-min-microvolt = <3000000>;
+	regulator-max-microvolt = <3000000>;
+	regulator-name = "avcc";
 };
 
 &reg_ldo_io0 {
@@ -339,6 +417,7 @@
 };
 
 &usbphy2 {
+	phy-supply = <&reg_bldo4>;
 	status = "okay";
 };
 
