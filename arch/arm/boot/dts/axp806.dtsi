@@ -1,0 +1,126 @@
+/*
+ * Copyright 2015 Chen-Yu Tsai
+ *
+ * Chen-Yu Tsai <wens@csie.org>
+ *
+ * This file is dual-licensed: you can use it either under the terms
+ * of the GPL or the X11 license, at your option. Note that this dual
+ * licensing only applies to this file, and not this project as a
+ * whole.
+ *
+ *  a) This file is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This file is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ * Or, alternatively,
+ *
+ *  b) Permission is hereby granted, free of charge, to any person
+ *     obtaining a copy of this software and associated documentation
+ *     files (the "Software"), to deal in the Software without
+ *     restriction, including without limitation the rights to use,
+ *     copy, modify, merge, publish, distribute, sublicense, and/or
+ *     sell copies of the Software, and to permit persons to whom the
+ *     Software is furnished to do so, subject to the following
+ *     conditions:
+ *
+ *     The above copyright notice and this permission notice shall be
+ *     included in all copies or substantial portions of the Software.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ *     OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+/*
+ * AXP809 Integrated Power Management Chip
+ */
+
+&axp806 {
+	compatible = "x-powers,axp806";
+	interrupt-controller;
+	#interrupt-cells = <1>;
+
+	regulators {
+		/* Default work frequency for buck regulators */
+		x-powers,dcdc-freq = <3000>;
+
+		reg_dcdca: dcdca {
+			regulator-name = "dcdca";
+		};
+
+		reg_dcdcb: dcdcb {
+			regulator-name = "dcdcb";
+		};
+
+		reg_dcdcc: dcdcc {
+			regulator-name = "dcdcc";
+		};
+
+		reg_dcdcd: dcdcd {
+			regulator-name = "dcdcd";
+		};
+
+		reg_dcdce: dcdce {
+			regulator-name = "dcdce";
+		};
+
+		/*
+		 * To avoid name clashes with AXP809 regulators,
+		 * some regulators have "s_" (for "slave") prefixed.
+		 */
+		reg_s_aldo1: aldo1 {
+			regulator-name = "s_aldo1";
+		};
+
+		reg_s_aldo2: aldo2 {
+			regulator-name = "s_aldo2";
+		};
+
+		reg_s_aldo3: aldo3 {
+			regulator-name = "s_aldo3";
+		};
+
+		reg_bldo1: bldo1 {
+			regulator-name = "bldo1";
+		};
+
+		reg_bldo2: bldo2 {
+			regulator-name = "bldo2";
+		};
+
+		reg_bldo3: bldo3 {
+			regulator-name = "bldo3";
+		};
+
+		reg_bldo4: bldo4 {
+			regulator-name = "bldo4";
+		};
+
+		reg_cldo1: cldo1 {
+			regulator-name = "cldo1";
+		};
+
+		reg_cldo2: cldo2 {
+			regulator-name = "cldo2";
+		};
+
+		reg_cldo3: cldo3 {
+			regulator-name = "cldo3";
+		};
+
+		reg_s_sw: sw {
+			regulator-name = "s_sw";
+		};
+	};
+};
