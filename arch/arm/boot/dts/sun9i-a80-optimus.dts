@@ -108,7 +108,8 @@
 };
 
 &ehci1 {
-	status = "okay";
+	status = "disabled";
+	/* Only enable if something is connected */
 };
 
 &ehci2 {
@@ -469,7 +470,8 @@
 
 &usbphy2 {
 	phy-supply = <&reg_bldo4>;
-	status = "okay";
+	/* Only enable if something is connected */
+	status = "disabled";
 };
 
 &usbphy3 {
