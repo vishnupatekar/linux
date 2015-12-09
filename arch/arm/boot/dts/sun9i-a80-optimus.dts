@@ -370,13 +370,6 @@
 	regulator-name = "vcc-pm-codec-io1";
 };
 
-&reg_s_aldo1 {
-	regulator-always-on;
-	regulator-min-microvolt = <3000000>;
-	regulator-max-microvolt = <3000000>;
-	regulator-name = "avcc";
-};
-
 &reg_ldo_io0 {
 	regulator-always-on;
 	regulator-min-microvolt = <3000000>;
@@ -392,6 +385,13 @@
 
 &reg_rtc_ldo {
 	regulator-name = "vcc-rtc-vdd1v8-io";
+};
+
+&reg_s_aldo1 {
+	regulator-always-on;
+	regulator-min-microvolt = <3000000>;
+	regulator-max-microvolt = <3000000>;
+	regulator-name = "avcc";
 };
 
 &uart0 {
