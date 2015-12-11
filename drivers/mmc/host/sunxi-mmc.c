@@ -846,6 +846,11 @@ static void sunxi_mmc_request(struct mmc_host *mmc, struct mmc_request *mrq)
 		}
 	}
 
+	if (cmd->opcode == SD_SWITCH_VOLTAGE) {
+		cmd_val |= SDXC_VOLTAGE_SWITCH;
+		imask |= SDXC_VOLTAGE_CHANGE_DONE;
+	}
+
 	if (cmd->opcode == MMC_GO_IDLE_STATE) {
 		cmd_val |= SDXC_SEND_INIT_SEQUENCE;
 		imask |= SDXC_COMMAND_DONE;
