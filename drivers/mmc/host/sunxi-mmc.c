@@ -1139,6 +1139,11 @@ static int sunxi_mmc_probe(struct platform_device *pdev)
 				  MMC_CAP_1_8V_DDR |
 				  MMC_CAP_ERASE | MMC_CAP_SDIO_IRQ;
 
+	/* If vqmmc is supplied, we can do signal voltage switching for UHS */
+	if (!(IS_ERR(mmc->supply.vqmmc)))
+		mmc->caps |= MMC_CAP_UHS_SDR12 | MMC_CAP_UHS_SDR25 |
+			     MMC_CAP_UHS_SDR50 | MMC_CAP_UHS_DDR50;
+
 	ret = mmc_of_parse(mmc);
 	if (ret)
 		goto error_free_dma;
