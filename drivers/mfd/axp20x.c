@@ -37,6 +37,7 @@ static const char * const axp20x_model_names[] = {
 	"AXP288",
 	"AXP806",
 	"AXP809",
+	"AXP813",
 };
 
 static const struct regmap_range axp152_writeable_ranges[] = {
@@ -144,6 +145,18 @@ static const struct regmap_access_table axp806_volatile_table = {
 	.yes_ranges	= axp806_volatile_ranges,
 	.n_yes_ranges	= ARRAY_SIZE(axp806_volatile_ranges),
 };
+
+static const struct regmap_range axp81x_writeable_ranges[] = {
+	regmap_reg_range(AXP20X_DATACACHE(0), AXP81X_BC_USB_STAT_REG),
+	regmap_reg_range(AXP81X_VBUS_PATH_HOLD_REG, AXP20X_IRQ6_STATE),
+	regmap_reg_range(AXP20X_DCDC_MODE, AXP22X_BATLOW_THRES1),
+};
+
+static const struct regmap_access_table axp81x_writeable_table = {
+	.yes_ranges	= axp81x_writeable_ranges,
+	.n_yes_ranges	= ARRAY_SIZE(axp81x_writeable_ranges),
+};
+
 
 static struct resource axp152_pek_resources[] = {
 	DEFINE_RES_IRQ_NAMED(AXP152_IRQ_PEK_RIS_EDGE, "PEK_DBR"),
@@ -292,6 +305,15 @@ static const struct regmap_config axp806_regmap_config = {
 	.cache_type	= REGCACHE_RBTREE,
 };
 
+static const struct regmap_config axp81x_regmap_config = {
+	.reg_bits	= 8,
+	.val_bits	= 8,
+	.wr_table	= &axp81x_writeable_table,
+	.volatile_table	= &axp22x_volatile_table,
+	.max_register	= AXP22X_BATLOW_THRES1,
+	.cache_type	= REGCACHE_RBTREE,
+};
+
 #define INIT_REGMAP_IRQ(_variant, _irq, _off, _mask)			\
 	[_variant##_IRQ_##_irq] = { .reg_offset = (_off), .mask = BIT(_mask) }
 
@@ -384,6 +406,7 @@ static const struct regmap_irq axp22x_regmap_irqs[] = {
 };
 
 /* some IRQs are compatible with axp20x models */
+/* all IRQs are same as AXP81x */
 static const struct regmap_irq axp288_regmap_irqs[] = {
 	INIT_REGMAP_IRQ(AXP288, VBUS_FALL,              0, 2),
 	INIT_REGMAP_IRQ(AXP288, VBUS_RISE,              0, 3),
@@ -709,6 +732,18 @@ static struct mfd_cell axp809_cells[] = {
 	},
 };
 
+/* TODO: Power On Key i.e. POK is yet to be added here */
+static struct mfd_cell axp81x_cells[] = {
+	{
+		.name = "axp20x-pek",
+		.num_resources = ARRAY_SIZE(axp288_power_button_resources),
+		.resources = axp288_power_button_resources,
+	}, {
+		.id			= 1,
+		.name			= "axp20x-regulator",
+	},
+};
+
 static struct axp20x_dev *axp20x_pm_power_off;
 static void axp20x_power_off(void)
 {
@@ -779,6 +814,12 @@ int axp20x_match_device(struct axp20x_dev *axp20x)
 		axp20x->cells = axp809_cells;
 		axp20x->regmap_cfg = &axp22x_regmap_config;
 		axp20x->regmap_irq_chip = &axp809_regmap_irq_chip;
+		break;
+	case AXP813_ID:
+		axp20x->nr_cells = ARRAY_SIZE(axp81x_cells);
+		axp20x->cells = axp81x_cells;
+		axp20x->regmap_cfg = &axp81x_regmap_config;
+		axp20x->regmap_irq_chip = &axp288_regmap_irq_chip;
 		break;
 	default:
 		dev_err(dev, "unsupported AXP20X ID %lu\n", axp20x->variant);
