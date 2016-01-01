@@ -169,6 +169,34 @@
 			clocks = <&osc32k>, <&osc24M>, <&pll6>, <&pll6>;
 			clock-output-names = "apb2";
 		};
+
+		apb1_gates: clk@01c20068 {
+			#clock-cells = <1>;
+			compatible = "allwinner,sun8i-a83t-apb1-gates-clk";
+			reg = <0x01c20068 0x4>;
+			clocks = <&apb1>;
+			clock-indices = <1>, <5>,
+					<12>, <13>,
+					<14>, <15>;
+			clock-output-names = "apb1_codec", "apb1_pio",
+					"apb1_daudio0",	"apb1_daudio1",
+					"apb1_daudio2",	"apb1_tdm";
+		};
+
+		apb2_gates: clk@01c2006c {
+			#clock-cells = <1>;
+			compatible = "allwinner,sun8i-a83t-apb2-gates-clk";
+			reg = <0x01c2006c 0x4>;
+			clocks = <&apb2>;
+			clock-indices = <0>, <1>,
+					<2>, <16>,
+					<17>, <18>,
+					<19>, <20>;
+			clock-output-names = "apb2_i2c0", "apb2_i2c1",
+					"apb2_i2c2", "apb2_uart0",
+					"apb2_uart1", "apb2_uart2",
+					"apb2_uart3", "apb2_uart4";
+		};
 	};
 
 	soc {
@@ -189,7 +217,7 @@
 				     <GIC_SPI 17 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>;
 			reg = <0x01c20800 0x400>;
-			clocks = <&osc24M>;
+			clocks = <&apb1_gates 5>;
 			gpio-controller;
 			interrupt-controller;
 			#interrupt-cells = <3>;
@@ -232,7 +260,8 @@
 			interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH>;
 			reg-shift = <2>;
 			reg-io-width = <4>;
-			clocks = <&osc24M>;
+			clocks = <&apb2_gates 16>;
+			resets = <&apb2_reset 16>;
 			status = "disabled";
 		};
 
