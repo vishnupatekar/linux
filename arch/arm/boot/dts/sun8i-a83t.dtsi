@@ -177,6 +177,48 @@
 			clocks = <&osc32k>, <&osc24M>, <&pll6>, <&pll6>;
 			clock-output-names = "apb2";
 		};
+
+		bus_gates: clk@01c20060 {
+			#clock-cells = <1>;
+			compatible = "allwinner,sun8i-a83t-bus-gates-clk";
+			reg = <0x01c20060 0x10>;
+			clocks = <&ahb1>, <&ahb2>, <&apb1>, <&apb2>;
+			clock-names = "ahb1", "ahb2", "apb1", "apb2";
+			clock-indices = <1>, <5>, <6>,
+					<8>, <9>, <10>,
+					<13>, <14>, <17>,
+					<19>, <20>,
+					<21>, <24>,
+					<26>, <27>,
+					<29>, <32>,
+					<36>, <37>,
+					<40>, <43>,
+					<44>, <52>, <53>,
+					<54>, <65>,
+					<69>, <76>, <77>,
+					<78>, <79>, <96>,
+					<97>, <98>,
+					<112>, <113>,
+					<114>, <115>,
+					<116>;
+			clock-output-names = "bus_mipidsi", "bus_ss", "bus_dma",
+					     "bus_mmc0", "bus_mmc1", "bus_mmc2",
+					     "bus_nand", "bus_sdram", "bus_emac",
+					     "bus_hstimer", "bus_spi0",
+					     "bus_spi1", "bus_usb_drd",
+					     "bus_ehci0", "bus_ehci1",
+					     "bus_ohci0", "bus_ve",
+					     "bus_lcd0", "bus_lcd1",
+					     "bus_csi", "bus_hdmi",
+					     "bus_de", "bus_gpu", "bus_msgbox",
+					     "bus_spinlock", "bus_owa",
+					     "bus_pio", "bus_i2s0", "bus_i2s1",
+					     "bus_i2s2", "bus_tdm", "bus_i2c0",
+					     "bus_i2c1", "bus_i2c2",
+					     "bus_uart0", "bus_uart1",
+					     "bus_uart2", "bus_uart3",
+					     "bus_uart4";
+		};
 	};
 
 	soc {
@@ -197,7 +239,7 @@
 				     <GIC_SPI 17 IRQ_TYPE_LEVEL_HIGH>,
 				     <GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>;
 			reg = <0x01c20800 0x400>;
-			clocks = <&osc24M>;
+			clocks = <&bus_gates 69>;
 			gpio-controller;
 			interrupt-controller;
 			#interrupt-cells = <3>;
@@ -240,7 +282,8 @@
 			interrupts = <GIC_SPI 0 IRQ_TYPE_LEVEL_HIGH>;
 			reg-shift = <2>;
 			reg-io-width = <4>;
-			clocks = <&osc24M>;
+			clocks = <&bus_gates 112>;
+			resets = <&apb2_reset 16>;
 			status = "disabled";
 		};
 
